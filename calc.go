@@ -34,14 +34,18 @@ find:
 		case '%':
 		case '(':
 		case ')':
-			continue find
-		case '\n':
-			error = true
-			break find
+		case ' ':
+			continue
 		default:
 			error = true
 			break find
 		}
 	}
 	return error
+}
+
+func lexer(exp string) (bool, []string) {
+	var tokens []string
+	var error bool = false
+	return error, tokens
 }
