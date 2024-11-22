@@ -1,9 +1,6 @@
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Scanner;
-
 import static java.lang.System.exit;
-import static java.lang.System.out;
 
 public class Main {
     public static void main(String[] args) {
@@ -28,12 +25,13 @@ public class Main {
             }
 
             for (String str : tokens){
-                out.println("debug: "+str);
+                System.out.println("debug: "+str);
             }
 
         }
     }
 
+    //Input Symbol Validity Check: start
     static boolean symbol_error(String input) {
         char[] valid_symbols = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '+', '-', '*', '/', '%', '(', ')'};
         boolean error = false;
@@ -51,7 +49,9 @@ public class Main {
         }
         return error;
     }
+    //Input Symbol Validity Check: end
 
+    //Tokenization: start
     static ArrayList<String> lexer(char[] input) {
         char[] math_symbols = {'+','-','*','/','%','(',')'};
         ArrayList<String> tokens = new ArrayList<>();
@@ -98,4 +98,208 @@ public class Main {
         }
         return num_symbol;
     }
+    //Tokenization: end
+
+    //Parsing: start
+    static void parser(ArrayList<String> tokens) {
+        int x = 0;
+        while(x < tokens.size()){
+            if(tokens.get(x).equals("(")){
+                int close_paren = 0;
+                int y = x + 1;
+                while(y < tokens.size()){
+                    if (tokens.get(y).equals(")")){
+                        close_paren = y;
+                        break;
+                    }else {
+                        //error: no end parenthesis
+                        System.out.println("error: no end parenthesis!");
+                        exit(1);
+                    }
+                    y += 1;
+                }
+                ArrayList<String> expression = (ArrayList<String>) tokens.subList(x+1,close_paren);
+                if (expression.contains("(")){
+                    x += 1;
+                    continue;
+                }else {
+                    expression = multiply_divide_modulo(expression);
+                    expression = addition_subtraction(expression);
+
+                    if (x == 0 && tokens.size()-1 == close_paren){
+                        tokens = expression;
+                        break;
+                    } else if (x > 0 && close_paren < tokens.size()-1) {
+                        if (tokens.get(x-1).equals("+") || tokens.get(x-1).equals("-") || tokens.get(x-1).equals("*") || tokens.get(x-1).equals("/") || tokens.get(x-1).equals("%") && tokens.get(close_paren+1).equals("+") || tokens.get(close_paren+1).equals("-") || tokens.get(close_paren+1).equals("*") || tokens.get(close_paren+1).equals("/") || tokens.get(close_paren+1).equals("%")){
+                            var temp = (ArrayList<String>) tokens.subList(0,x);
+                            temp.add(expression.getFirst());
+                            temp.addAll(tokens.subList(close_paren+1, tokens.size()));
+                            tokens = temp;
+                            x = 0;
+                            continue;
+                        }else if(!tokens.get(x-1).equals("+") && !tokens.get(x-1).equals("-") && !tokens.get(x-1).equals("*") && !tokens.get(x-1).equals("/") && !tokens.get(x-1).equals("%") && tokens.get(close_paren+1).equals("+") || tokens.get(close_paren+1).equals("-") || tokens.get(close_paren+1).equals("*") || tokens.get(close_paren+1).equals("/") || tokens.get(close_paren+1).equals("%")) {
+                            expression.addFirst("*");
+                            var temp = (ArrayList<String>) tokens.subList(0,x);
+                            temp.addAll(expression);
+                            temp.addAll(tokens.subList(close_paren+1, tokens.size()));
+                            tokens = temp;
+                            x = 0;
+                            continue;
+                        }else if (tokens.get(x-1).equals("+") || tokens.get(x-1).equals("-") || tokens.get(x-1).equals("*") || tokens.get(x-1).equals("/") || tokens.get(x-1).equals("%") && !tokens.get(close_paren+1).equals("+") && !tokens.get(close_paren+1).equals("-") && !tokens.get(close_paren+1).equals("*") && !tokens.get(close_paren+1).equals("/") && !tokens.get(close_paren+1).equals("%")){
+                            expression.addLast("*");
+                            var temp = (ArrayList<String>) tokens.subList(0,x);
+                            temp.addAll(expression);
+                            temp.addAll(tokens.subList(close_paren+1, tokens.size()));
+                            tokens = temp;
+                            x = 0;
+                            continue;
+                        }
+                    } else if (x > 0 && close_paren == tokens.size()-1){
+                        if(!tokens.get(x-1).equals("+") && !tokens.get(x-1).equals("-") && !tokens.get(x-1).equals("*") && !tokens.get(x-1).equals("/") && !tokens.get(x-1).equals("%")){
+                            expression.addFirst("*");
+                            var temp = (ArrayList<String>) tokens.subList(0,x);
+                            temp.addAll(expression);
+                            tokens = temp;
+                            x = 0;
+                            continue;
+                        } else if (tokens.get(x-1).equals("+") || tokens.get(x-1).equals("-") || tokens.get(x-1).equals("*") || tokens.get(x-1).equals("/") || tokens.get(x-1).equals("%")) {
+                            var temp = (ArrayList<String>) tokens.subList(0,x);
+                            temp.addAll(expression);
+                            tokens = temp;
+                            x = 0;
+                            continue;
+                        }
+
+                    } else if (x == 0 && close_paren < tokens.size()-1) {
+                        if (!tokens.get(close_paren+1).equals("+") && !tokens.get(close_paren+1).equals("-") && !tokens.get(close_paren+1).equals("*") && !tokens.get(close_paren+1).equals("/") && !tokens.get(close_paren+1).equals("%")){
+                            expression.addLast("*");
+                            var temp = new ArrayList<String>();
+                            temp.addAll(expression);
+                            temp.addAll(tokens.subList(close_paren+1, tokens.size()));
+                            tokens = temp;
+                            x = 0;
+                            continue;
+                        } else if (tokens.get(close_paren+1).equals("+") || tokens.get(close_paren+1).equals("-") || tokens.get(close_paren+1).equals("*") || tokens.get(close_paren+1).equals("/") || tokens.get(close_paren+1).equals("%")) {
+                            var temp = new ArrayList<String>();
+                            temp.addAll(expression);
+                            temp.addAll(tokens.subList(close_paren+1, tokens.size()));
+                            tokens = temp;
+                            x = 0;
+                            continue;
+                        }
+                    }
+
+                }
+            }
+            x += 1;
+        }
+
+    }
+    static ArrayList<String> multiply_divide_modulo(ArrayList<String> simple_exp) {
+        int x = 0;
+        while (x < simple_exp.size()) {
+            if (x != 0 && simple_exp.get(x).equals("*") && x + 1 < simple_exp.size()) {
+                try {
+                    var result = Double.parseDouble(simple_exp.get(x - 1)) * Double.parseDouble(simple_exp.get(x + 1));
+
+                    var temp = new ArrayList<String>();
+                    temp.addAll(simple_exp.subList(0, x - 1));
+                    temp.addLast(String.valueOf(result));
+                    if (x + 2 < simple_exp.size()) {
+                        temp.addAll(simple_exp.subList(x + 2, simple_exp.size()));
+                    }
+                    simple_exp = temp;
+                    x = x - 2;
+                } catch (Error e){
+                    System.out.println("error: invalid expression!");
+                    exit(1);
+                }
+            } else if (x != 0 && simple_exp.get(x).equals("/") && x + 1 < simple_exp.size()) {
+                try {
+                    var result = Double.parseDouble(simple_exp.get(x - 1)) / Double.parseDouble(simple_exp.get(x + 1));
+
+
+                    var temp = new ArrayList<String>();
+                    temp.addAll(simple_exp.subList(0, x - 1));
+                    temp.addLast(String.valueOf(result));
+                    if (x + 2 < simple_exp.size()) {
+                        temp.addAll(simple_exp.subList(x + 2, simple_exp.size()));
+                    }
+                    simple_exp = temp;
+                    x = x - 2;
+                }catch (Error e){
+                    System.out.println("error: invalid expression!");
+                    exit(1);
+                }
+            } else if (x != 0 && simple_exp.get(x).equals("%") && x + 1 < simple_exp.size()) {
+                try {
+                    var result = Double.parseDouble(simple_exp.get(x - 1)) % Double.parseDouble(simple_exp.get(x + 1));
+                    var temp = new ArrayList<String>();
+                    temp.addAll(simple_exp.subList(0, x - 1));
+                    temp.addLast(String.valueOf(result));
+                    if (x + 2 < simple_exp.size()) {
+                        temp.addAll(simple_exp.subList(x + 2, simple_exp.size()));
+                    }
+                    simple_exp = temp;
+                    x = x - 2;
+                } catch (Error e){
+                    System.out.println("error: invalid expression!");
+                    exit(1);
+                }
+            }
+            x += 1;
+        }
+        if (simple_exp.contains("*") || simple_exp.contains("/") || simple_exp.contains("%")) {
+            //error: invalid expression
+            System.out.println("error: invalid expression!");
+            exit(1);
+        }
+        return simple_exp;
+    }
+    static ArrayList<String> addition_subtraction(ArrayList<String> simple_exp) {
+        var x = 0;
+        while (x < simple_exp.size()){
+            if (x != 0 && simple_exp.get(x).equals("+") && x + 1 < simple_exp.size()) {
+                try {
+                    var result = Double.parseDouble(simple_exp.get(x - 1)) + Double.parseDouble(simple_exp.get(x + 1));
+
+                    var temp = new ArrayList<String>();
+                    temp.addAll(simple_exp.subList(0, x - 1));
+                    temp.addLast(String.valueOf(result));
+                    if (x + 2 < simple_exp.size()) {
+                        temp.addAll(simple_exp.subList(x + 2, simple_exp.size()));
+                    }
+                    simple_exp = temp;
+                    x = x - 2;
+                } catch (Error e){
+                    System.out.println("error: invalid expression!");
+                    exit(1);
+                }
+            }else if (x != 0 && simple_exp.get(x).equals("-") && x + 1 < simple_exp.size()) {
+                try {
+                    var result = Double.parseDouble(simple_exp.get(x - 1)) - Double.parseDouble(simple_exp.get(x + 1));
+
+                    var temp = new ArrayList<String>();
+                    temp.addAll(simple_exp.subList(0, x - 1));
+                    temp.addLast(String.valueOf(result));
+                    if (x + 2 < simple_exp.size()) {
+                        temp.addAll(simple_exp.subList(x + 2, simple_exp.size()));
+                    }
+                    simple_exp = temp;
+                    x = x - 2;
+                } catch (Error e){
+                    System.out.println("error: invalid expression!");
+                    exit(1);
+                }
+            }
+            x += 1;
+        }
+        if (simple_exp.contains("+") || simple_exp.contains("-")) {
+            //error: invalid expression
+            System.out.println("error: invalid expression!");
+            exit(1);
+        }
+        return simple_exp;
+    }
+    //Parsing: end
 }
