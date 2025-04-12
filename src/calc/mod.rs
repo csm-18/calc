@@ -1,5 +1,7 @@
 use std::{fmt::Error, process::exit};
 
+mod parser;
+
 pub fn calc(exp:&str){
     //remove spaces from input expression
     let exp = exp.replace("\n", "");
@@ -21,7 +23,7 @@ pub fn calc(exp:&str){
         
     };
     println!("{exp}");
-    dbg!(&tokens);
+    parser::parser(tokens);
 
 }
 
@@ -60,7 +62,7 @@ fn valid_symbols(exp:&str)-> bool{
 
 
 #[derive(Debug)]
-enum TokenType {
+pub enum TokenType {
     Num,
     LeftParen,
     RightParen,
@@ -72,7 +74,7 @@ enum TokenType {
 }
 
 #[derive(Debug)]
-struct Token {
+pub struct Token {
     token_type: TokenType,
     value: String,
 }
