@@ -1,5 +1,8 @@
 pub fn calc(exp:&str){
-    println!("calc!!!");
-    dbg!(exp);
+    //remove spaces from input expression
+    let exp = exp.replace("\n", "");
+    let exp = exp.replace(" ", "");
+    
+    println!("{exp}");
 
 }
