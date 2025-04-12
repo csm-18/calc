@@ -1,5 +1,8 @@
 use std::{io::{stdin, stdout, Write}, process::exit};
 
+
+mod calc;
+
 const VERSION:&str = "0.1.0";
 fn main() {
     println!("calc {VERSION}");
@@ -13,8 +16,8 @@ fn main() {
         if &exp == "\n" {
             continue;
         }
-        
-        dbg!(exp);
+
+        calc::calc(&exp);
     }
 }
 
