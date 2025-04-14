@@ -61,7 +61,7 @@ fn valid_symbols(exp:&str)-> bool{
 }
 
 
-#[derive(Debug)]
+#[derive(Debug,PartialEq)]
 pub enum TokenType {
     Num,
     LeftParen,
