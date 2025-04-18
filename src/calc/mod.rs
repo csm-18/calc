@@ -58,7 +58,7 @@ fn valid_symbols(exp: &str) -> bool {
     true
 }
 
-#[derive(Debug, PartialEq,Clone)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum TokenType {
     Num,
     LeftParen,
@@ -70,7 +70,7 @@ pub enum TokenType {
     Remainder,
 }
 
-#[derive(Debug,Clone)]
+#[derive(Debug, Clone)]
 pub struct Token {
     token_type: TokenType,
     value: String,
