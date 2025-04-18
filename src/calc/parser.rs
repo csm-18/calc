@@ -3,8 +3,8 @@
 use crate::calc::{Token, TokenType};
 
 pub fn parser(tokens: Vec<Token>) {
-    println!("testing eval() calculation!");
-    match eval(tokens) {
+    println!("testing eval_with_parenthesis() calculation!");
+    match eval_with_parenthesis(tokens) {
         Ok(tokens) => {
             let final_result = tokens[0].value.parse::<f64>().unwrap();
             println!("{}", final_result);
@@ -15,81 +15,81 @@ pub fn parser(tokens: Vec<Token>) {
     };
 }
 
-// fn eval_with_parenthesis(tokens: Vec<Token>) -> Result<Vec<Token>, String> {
-//     let mut tokens = tokens;
-//     if tokens.iter().any(|token| 
-//         matches!(
-//             token.token_type,
-//             TokenType::LeftParen | TokenType::RightParen
-//         )
-//     ) {
-//         let mut x = 0;
-//         while x < tokens.len() {
-//             if tokens[x].token_type == TokenType::LeftParen {
-//                 let mut no_right_paren = true;
-//                 let mut y = x + 1;
-//                 while y < tokens.len() {
-//                     if tokens[y].token_type == TokenType::RightParen {
-//                         no_right_paren = false;
-//                         break;
-//                     }
-//                     y += 1;
-//                 }
+fn eval_with_parenthesis(tokens: Vec<Token>) -> Result<Vec<Token>, String> {
+    let mut tokens = tokens;
+    if tokens.iter().any(|token| 
+        matches!(
+            token.token_type,
+            TokenType::LeftParen | TokenType::RightParen
+        )
+    ) {
+        let mut x = 0;
+        while x < tokens.len() {
+            if tokens[x].token_type == TokenType::LeftParen {
+                let mut no_right_paren = true;
+                let mut y = x + 1;
+                while y < tokens.len() {
+                    if tokens[y].token_type == TokenType::RightParen {
+                        no_right_paren = false;
+                        break;
+                    }
+                    y += 1;
+                }
 
-//                 if no_right_paren {
-//                     return Err("invalid expression!".to_string());
-//                 } else if tokens[x + 1..y]
-//                     .iter()
-//                     .any(|token| token.token_type == TokenType::LeftParen)
-//                 {
-//                     x += 1;
-//                     continue;
-//                 } else if y - x == 1 {
-//                         //empty parentheses
-//                         return Err("invalid expression!".to_string());
-//                 } else {
-//                         let paren_expression = tokens[x + 1..y].to_vec();
-//                         let paren_exp_result =  eval(paren_expression)?;
+                if no_right_paren {
+                    return Err("invalid expression!".to_string());
+                } else if tokens[x + 1..y]
+                    .iter()
+                    .any(|token| token.token_type == TokenType::LeftParen)
+                {
+                    x += 1;
+                    continue;
+                } else if y - x == 1 {
+                        //empty parentheses
+                        return Err("invalid expression!".to_string());
+                } else {
+                        let paren_expression = tokens[x + 1..y].to_vec();
+                        let paren_exp_result =  eval(paren_expression)?;
 
-//                         if x > 0 && y+1 < tokens.len() && tokens[x-1].token_type == TokenType::Num && tokens[y+1].token_type == TokenType::Num {
+                        if x > 0 && y+1 < tokens.len() && tokens[x-1].token_type == TokenType::Num && tokens[y+1].token_type == TokenType::Num {
 
-//                             tokens.drain(x..=y);
-//                             tokens.insert(x, Token { token_type: TokenType::Multiply, value: "*".to_string() });
-//                             tokens.insert(x+1, paren_exp_result[0].clone());
-//                             tokens.insert(x+2,Token { token_type: TokenType::Multiply, value: "*".to_string() });
+                            tokens.drain(x..=y);
+                            tokens.insert(x, Token { token_type: TokenType::Multiply, value: "*".to_string() });
+                            tokens.insert(x+1, paren_exp_result[0].clone());
+                            tokens.insert(x+2,Token { token_type: TokenType::Multiply, value: "*".to_string() });
                         
-//                             return eval_with_parenthesis(tokens.clone());
-//                         }else if x > 0 && tokens[x-1].token_type == TokenType::Num {
-//                             tokens.drain(x..=y);
-//                             tokens.insert(x, Token { token_type: TokenType::Multiply, value: "*".to_string() });
-//                             tokens.insert(x+1, paren_exp_result[0].clone());
+                            return eval_with_parenthesis(tokens.clone());
+                        }else if x > 0 && tokens[x-1].token_type == TokenType::Num {
+                            tokens.drain(x..=y);
+                            tokens.insert(x, Token { token_type: TokenType::Multiply, value: "*".to_string() });
+                            tokens.insert(x+1, paren_exp_result[0].clone());
 
-//                             return eval_with_parenthesis(tokens.clone());
+                            return eval_with_parenthesis(tokens.clone());
                             
-//                         }else if y+1 < tokens.len() && tokens[y+1].token_type == TokenType::Num {
-//                             tokens.drain(x..=y);
-//                             tokens.insert(x, paren_exp_result[0].clone());
-//                             tokens.insert(x+1, Token { token_type: TokenType::Multiply, value: "*".to_string() });
+                        }else if y+1 < tokens.len() && tokens[y+1].token_type == TokenType::Num {
+                            tokens.drain(x..=y);
+                            tokens.insert(x, paren_exp_result[0].clone());
+                            tokens.insert(x+1, Token { token_type: TokenType::Multiply, value: "*".to_string() });
                         
-//                             return eval_with_parenthesis(tokens.clone());
-//                         }else {
-//                             tokens.drain(x..=y);
-//                             tokens.insert(x,paren_exp_result[0].clone());
+                            return eval_with_parenthesis(tokens.clone());
+                        }else {
+                            tokens.drain(x..=y);
+                            tokens.insert(x,paren_exp_result[0].clone());
 
-//                             return eval_with_parenthesis(tokens.clone());
-//                         }
+                            return eval_with_parenthesis(tokens.clone());
+                        }
                             
                         
                         
-//                 }
+                }
                 
-//             }
-//             x += 1;
-//         }
-//     }
+            }
+            x += 1;
+        }
+    }
 
-//     eval(tokens)
-// }
+    eval(tokens)
+}
 
 
 
