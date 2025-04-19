@@ -27,4 +27,4 @@ It supports:
 
 MIT
 
-[comment]: # "todo: 1.handle spaces in lexer 2.add test cases to calc"
+[comment]: # "todo: add test cases to calc"
