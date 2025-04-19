@@ -3,7 +3,6 @@
 use crate::calc::{Token, TokenType};
 
 pub fn parser(tokens: Vec<Token>) {
-    println!("testing eval_with_parenthesis() calculation!");
     match eval_with_parenthesis(tokens) {
         Ok(tokens) => {
             let final_result = tokens[0].value.parse::<f64>().unwrap();
@@ -15,6 +14,7 @@ pub fn parser(tokens: Vec<Token>) {
     };
 }
 
+//to evaluate expressions that contain parenthesis as well
 fn eval_with_parenthesis(tokens: Vec<Token>) -> Result<Vec<Token>, String> {
     let mut tokens = tokens;
     if tokens.iter().any(|token| 

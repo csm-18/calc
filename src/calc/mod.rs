@@ -1,4 +1,3 @@
-use std::{fmt::Error, process::exit};
 
 mod parser;
 
@@ -21,7 +20,6 @@ pub fn calc(exp: &str) {
             return;
         }
     };
-    println!("{exp}");
     parser::parser(tokens);
 }
 
