@@ -2,24 +2,24 @@
 mod parser;
 
 pub fn calc(exp: &str) {
-    //remove spaces from input expression
-    let exp = exp.replace("\n", "");
-    let exp = exp.replace(" ", "");
+    //remove trailing whitespaces from input expression
+    let exp = exp.trim();
 
     //check for invalid symbols in expression
-    if !valid_symbols(&exp) {
+    if !valid_symbols(exp) {
         println!("invalid input!");
         return;
     }
 
     //get tokens from expression
-    let tokens = match lexer(&exp) {
+    let tokens = match lexer(exp) {
         Ok(tokens) => tokens,
         Err(error) => {
             println!("{error}");
             return;
         }
     };
+    
     parser::parser(tokens);
 }
 
@@ -46,9 +46,9 @@ fn valid_symbols(exp: &str) -> bool {
                 break;
             }
         }
-        if valid {
+        if valid || c == ' ' {
             continue;
-        } else {
+        }else {
             return false;
         }
     }
