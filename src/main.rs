@@ -5,7 +5,7 @@ use std::{
 
 mod calc;
 
-const VERSION: &str = "0.1.0";
+const VERSION: &str = "0.1.1";
 fn main() {
     println!("calc {VERSION}");
     loop {
@@ -19,7 +19,8 @@ fn main() {
             continue;
         }
 
-        calc::calc(&exp);
+        //print result
+        println!("{}",calc::calc(&exp));
     }
 }
 

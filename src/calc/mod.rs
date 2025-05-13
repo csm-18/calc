@@ -1,51 +1,47 @@
-
 mod parser;
 
-pub fn calc(exp: &str) {
+pub fn calc(exp: &str) -> String{
     //remove trailing whitespaces from input expression
     let exp = exp.trim();
 
     //check for invalid symbols in expression
     if !valid_symbols(exp) {
-        println!("invalid input!");
-        return;
+        return "invalid expression!".to_owned();
     }
 
     //get tokens from expression
     let tokens = match lexer(exp) {
         Ok(tokens) => tokens,
         Err(error) => {
-            println!("{error}");
-            return;
+            return error;
         }
     };
     
-    parser::parser(tokens);
+    match parser::eval_with_parenthesis(tokens) {
+        Ok(tokens) => {
+            let final_result = tokens[0].value.parse::<f64>().unwrap();
+            final_result.to_string()
+        }
+        Err(error) => {
+            error
+        }
+    }
+
 }
 
 fn valid_symbols(exp: &str) -> bool {
-    let numeric_symbols = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.'];
-    let math_symbols = ['+', '-', '*', '/', '%', '(', ')'];
+    let valid_symbols = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.','+', '-', '*', '/', '%', '(', ')'];
 
     for c in exp.chars() {
         let mut valid = false;
 
-        for ns in numeric_symbols {
-            if c == ns {
+        for vs in valid_symbols {
+            if c == vs {
                 valid = true;
                 break;
             }
         }
-        if valid {
-            continue;
-        }
-
-        for ms in math_symbols {
-            if c == ms {
-                valid = true;
-                break;
-            }
-        }
+        
         if valid || c == ' ' {
             continue;
         }else {
@@ -172,3 +168,5 @@ fn is_numeric(c: &str) -> bool {
     }
     false
 }
+
+

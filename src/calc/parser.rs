@@ -2,20 +2,10 @@
 
 use crate::calc::{Token, TokenType};
 
-pub fn parser(tokens: Vec<Token>) {
-    match eval_with_parenthesis(tokens) {
-        Ok(tokens) => {
-            let final_result = tokens[0].value.parse::<f64>().unwrap();
-            println!("{}", final_result);
-        }
-        Err(err) => {
-            println!("{}", err);
-        }
-    };
-}
+
 
 //to evaluate expressions that contain parenthesis as well
-fn eval_with_parenthesis(tokens: Vec<Token>) -> Result<Vec<Token>, String> {
+pub fn eval_with_parenthesis(tokens: Vec<Token>) -> Result<Vec<Token>, String> {
     let mut tokens = tokens;
     if tokens.iter().any(|token| 
         matches!(
@@ -154,7 +144,7 @@ fn add_and_subtract(tokens: Vec<Token>) -> Result<Vec<Token>, String> {
     while x < tokens.len() {
         if tokens.len() == 1 && tokens[x].token_type == TokenType::Num {
             return Ok(tokens);
-        } else if x != 0 && x + 1 < tokens.len() && tokens[x].token_type == TokenType::Plus {
+        } else if x != 0 && x + 1 < tokens.len() && tokens[x].token_type == TokenType::Plus || tokens[x].token_type == TokenType::Minus {
             let left_operand = match tokens[x - 1].value.parse::<f64>() {
                 Ok(num) => num,
                 Err(_) => return Err("invalid expression!".to_string()),
@@ -163,25 +153,14 @@ fn add_and_subtract(tokens: Vec<Token>) -> Result<Vec<Token>, String> {
                 Ok(num) => num,
                 Err(_) => return Err("invalid expression!".to_string()),
             };
-            let result = left_operand + right_operand;
-            let result_token = Token {
-                token_type: TokenType::Num,
-                value: result.to_string(),
-            };
-            tokens.drain(x - 1..=x + 1);
-            tokens.insert(x - 1, result_token);
-            x -= 1;
-            continue;
-        } else if x != 0 && x + 1 < tokens.len() && tokens[x].token_type == TokenType::Minus {
-            let left_operand = match tokens[x - 1].value.parse::<f64>() {
-                Ok(num) => num,
-                Err(_) => return Err("invalid expression!".to_string()),
-            };
-            let right_operand = match tokens[x + 1].value.parse::<f64>() {
-                Ok(num) => num,
-                Err(_) => return Err("invalid expression!".to_string()),
-            };
-            let result = left_operand - right_operand;
+
+            let mut result = 0.0;
+            if tokens[x].token_type == TokenType::Plus {
+                result = left_operand + right_operand;
+            } else if tokens[x].token_type == TokenType::Minus {
+                result = left_operand - right_operand;
+                
+            }
             let result_token = Token {
                 token_type: TokenType::Num,
                 value: result.to_string(),
@@ -211,7 +190,7 @@ fn multiply_and_divide_and_remainder(tokens: Vec<Token>) -> Result<Vec<Token>, S
     while x < tokens.len() {
         if tokens.len() == 1 && tokens[x].token_type == TokenType::Num {
             return Ok(tokens);
-        } else if x != 0 && x + 1 < tokens.len() && tokens[x].token_type == TokenType::Multiply {
+        } else if x != 0 && x + 1 < tokens.len() && tokens[x].token_type == TokenType::Multiply || tokens[x].token_type == TokenType::Divide || tokens[x].token_type == TokenType::Remainder {
             let left_operand = match tokens[x - 1].value.parse::<f64>() {
                 Ok(num) => num,
                 Err(_) => return Err("invalid expression!".to_string()),
@@ -220,43 +199,18 @@ fn multiply_and_divide_and_remainder(tokens: Vec<Token>) -> Result<Vec<Token>, S
                 Ok(num) => num,
                 Err(_) => return Err("invalid expression!".to_string()),
             };
-            let result = left_operand * right_operand;
-            let result_token = Token {
-                token_type: TokenType::Num,
-                value: result.to_string(),
-            };
-            tokens.drain(x - 1..=x + 1);
-            tokens.insert(x - 1, result_token);
-            x -= 1;
-            continue;
-        } else if x != 0 && x + 1 < tokens.len() && tokens[x].token_type == TokenType::Divide {
-            let left_operand = match tokens[x - 1].value.parse::<f64>() {
-                Ok(num) => num,
-                Err(_) => return Err("invalid expression!".to_string()),
-            };
-            let right_operand = match tokens[x + 1].value.parse::<f64>() {
-                Ok(num) => num,
-                Err(_) => return Err("invalid expression!".to_string()),
-            };
-            let result = left_operand / right_operand;
-            let result_token = Token {
-                token_type: TokenType::Num,
-                value: result.to_string(),
-            };
-            tokens.drain(x - 1..=x + 1);
-            tokens.insert(x - 1, result_token);
-            x -= 1;
-            continue;
-        } else if x != 0 && x + 1 < tokens.len() && tokens[x].token_type == TokenType::Remainder {
-            let left_operand = match tokens[x - 1].value.parse::<f64>() {
-                Ok(num) => num,
-                Err(_) => return Err("invalid expression!".to_string()),
-            };
-            let right_operand = match tokens[x + 1].value.parse::<f64>() {
-                Ok(num) => num,
-                Err(_) => return Err("invalid expression!".to_string()),
-            };
-            let result = left_operand % right_operand;
+
+            let mut result= 0.0;
+            if tokens[x].token_type == TokenType::Multiply {
+                
+                result = left_operand * right_operand;
+            }else if tokens[x].token_type == TokenType::Divide {
+                result = left_operand / right_operand;
+                
+            }else if tokens[x].token_type == TokenType::Remainder {
+                result = left_operand % right_operand;
+                
+            }
             let result_token = Token {
                 token_type: TokenType::Num,
                 value: result.to_string(),
